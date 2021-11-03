@@ -1,0 +1,137 @@
+import React, { useRef, useState } from "react";
+import Link from "next/link";
+
+const AddNew = ({ catData, handleShow }) => {
+  const batchIdRef = useRef();
+  const certificateRef = useRef();
+  const linksRef = useRef();
+  const cannabinoidRef = useRef();
+  const cbdPercentageRef = useRef();
+  const cbdMGRef = useRef();
+
+  const CatName = catData.map((cat) => cat.category);
+  const CatImg = catData.map((cat) => cat.img);
+
+  console.log(catData);
+
+  const [formData, setFormData] = useState({
+    category: CatName[0],
+    imgUrl: CatImg[0],
+    batchId: "",
+    certificate: "",
+    links: "",
+    cannabinoid: "",
+    cbdPercentage: "",
+    cbdMG_ML: "",
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    await fetch("http://localhost:5000/api/v1/reports", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        category: formData.category,
+        imgUrl: formData.imgUrl,
+        batchId: formData.batchId,
+        certificates: formData.certificate,
+        links: formData.links,
+        cannabinoid: formData.cannabinoid,
+        cbdPercentage: formData.cbdPercentage,
+        cbdMG_ML: formData.cbdMG_ML,
+      }),
+    });
+    // redirect to home page
+    handleShow();
+  };
+
+  const handleChangeBatchId = (e) => {
+    setFormData({ ...formData, batchId: e.target.value });
+  };
+  const handleChangeCertificate = (e) => {
+    setFormData({ ...formData, certificate: e.target.value });
+  };
+  const handleChangeLinks = (e) => {
+    setFormData({ ...formData, links: e.target.value });
+  };
+  const handleChangeCannabinoid = (e) => {
+    setFormData({ ...formData, cannabinoid: e.target.value });
+  };
+  const handleChangeCBDPercentage = (e) => {
+    setFormData({ ...formData, cbdPercentage: e.target.value });
+  };
+  const handleChangeCBDMG_ML = (e) => {
+    setFormData({ ...formData, cbdMG_ML: e.target.value });
+  };
+
+  return (
+    <div className="container">
+      <h1>Add New {CatName}</h1>
+      <div className="card">
+        <form className="form-control" onSubmit={handleSubmit}>
+          <label htmlFor="bacthId">Batch ID</label>
+          <input
+            type="text"
+            className="input"
+            id="batchId"
+            onChange={handleChangeBatchId}
+            ref={batchIdRef}
+          />
+          <label htmlFor="certificates">Certificate</label>
+          <input
+            type="text"
+            className="input"
+            id="certificates"
+            onChange={handleChangeCertificate}
+            ref={certificateRef}
+          />
+          <label htmlFor="links">Links</label>
+          {/*  out a input tag for each link in the links array */}
+
+          <input
+            type="text"
+            id="links"
+            onChange={handleChangeLinks}
+            ref={linksRef}
+          />
+          <label htmlFor="cannbinoid">Cannabinoid</label>
+          <input
+            type="text"
+            id="cannabinoid"
+            onChange={handleChangeCannabinoid}
+            ref={cannabinoidRef}
+          />
+          <label htmlFor="cbdPercentage">% (W/W)</label>
+          <input
+            type="text"
+            id="cbdPercentage"
+            onChange={handleChangeCBDPercentage}
+            ref={cbdPercentageRef}
+          />
+          <label htmlFor="mgPerBottle">mg/30ml bottle</label>
+          <input
+            type="text"
+            id="mgPerBottle"
+            onChange={handleChangeCBDMG_ML}
+            ref={cbdMGRef}
+          />
+          <div className="btn_control">
+            <button type="submit" className="btnAdd">
+              Submit
+            </button>
+            <Link href={`/`}>
+              <button type="button" className="btnEdit">
+                Cancel
+              </button>
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AddNew;

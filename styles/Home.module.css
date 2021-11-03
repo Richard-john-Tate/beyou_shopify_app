@@ -1,0 +1,128 @@
+.container {
+  min-height: 100vh;
+  padding: 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.main {
+  padding: 5rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 800px;
+}
+
+.gridList {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  max-width: 800px;
+}
+.btnAdd {
+  background-color: #084c3f;
+  color: #fff;
+  border-radius: 5px;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+.btnAdd:hover {
+  background-color: #24695cf1;
+  border: 1px solid #084c3f;
+}
+.btnEdit {
+  background-color: rgba(204, 204, 204, 0.281);
+  color: #303030;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  border-radius: 5px;
+  letter-spacing: 1px;
+}
+.btnEdit:hover {
+  background-color: #cdcdcd6b;
+}
+.btn_control {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 1rem;
+}
+.card {
+  margin: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.card_title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.card_content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.gridList .card {
+  margin: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  display: flex;
+  justify-content: space-around;
+}
+.gridList .card img {
+  width: 30%;
+  height: auto;
+}
+.card:hover,
+.card:focus,
+.card:active {
+  color: #0070f3;
+  border-color: #0070f3;
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.card p {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+}
