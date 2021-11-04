@@ -10,13 +10,11 @@ const AddNew = ({ catData, handleShow }) => {
   const cbdMGRef = useRef();
 
   const CatName = catData.map((cat) => cat.category);
-  const CatImg = catData.map((cat) => cat.img);
-
-  console.log(catData);
+  const CatImg = catData.map((cat) => cat.imgUrl);
 
   const [formData, setFormData] = useState({
-    category: CatName[0],
-    imgUrl: CatImg[0],
+    category: "",
+    imgUrl: "",
     batchId: "",
     certificate: "",
     links: "",
@@ -34,8 +32,8 @@ const AddNew = ({ catData, handleShow }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        category: formData.category,
-        imgUrl: formData.imgUrl,
+        category: CatName,
+        imgUrl: CatImg,
         batchId: formData.batchId,
         certificates: formData.certificate,
         links: formData.links,
@@ -79,6 +77,7 @@ const AddNew = ({ catData, handleShow }) => {
             id="batchId"
             onChange={handleChangeBatchId}
             ref={batchIdRef}
+            value={formData.batchId}
           />
           <label htmlFor="certificates">Certificate</label>
           <input
@@ -87,6 +86,7 @@ const AddNew = ({ catData, handleShow }) => {
             id="certificates"
             onChange={handleChangeCertificate}
             ref={certificateRef}
+            value={formData.certificate}
           />
           <label htmlFor="links">Links</label>
           {/*  out a input tag for each link in the links array */}
@@ -96,6 +96,7 @@ const AddNew = ({ catData, handleShow }) => {
             id="links"
             onChange={handleChangeLinks}
             ref={linksRef}
+            value={formData.links}
           />
           <label htmlFor="cannbinoid">Cannabinoid</label>
           <input
@@ -103,6 +104,7 @@ const AddNew = ({ catData, handleShow }) => {
             id="cannabinoid"
             onChange={handleChangeCannabinoid}
             ref={cannabinoidRef}
+            value={formData.cannabinoid}
           />
           <label htmlFor="cbdPercentage">% (W/W)</label>
           <input
@@ -110,6 +112,7 @@ const AddNew = ({ catData, handleShow }) => {
             id="cbdPercentage"
             onChange={handleChangeCBDPercentage}
             ref={cbdPercentageRef}
+            value={formData.cbdPercentage}
           />
           <label htmlFor="mgPerBottle">mg/30ml bottle</label>
           <input
@@ -117,6 +120,7 @@ const AddNew = ({ catData, handleShow }) => {
             id="mgPerBottle"
             onChange={handleChangeCBDMG_ML}
             ref={cbdMGRef}
+            value={formData.cbdMG_ML}
           />
           <div className="btn_control">
             <button type="submit" className="btnAdd">

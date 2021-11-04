@@ -6,6 +6,9 @@ import Shopify, { ApiVersion } from "@shopify/shopify-api";
 import Koa from "koa";
 import next from "next";
 import Router from "koa-router";
+import bodyParser from "koa-bodyparser";
+import connectDB from "./dbConnect";
+import Report from "./models/report_models";
 
 dotenv.config();
 const port = parseInt(process.env.PORT, 10) || 8081;
@@ -20,7 +23,7 @@ Shopify.Context.initialize({
   API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
   SCOPES: process.env.SCOPES.split(","),
   HOST_NAME: process.env.HOST.replace(/https:\/\//, ""),
-  API_VERSION: ApiVersion.October20,
+  API_VERSION: ApiVersion.January21,
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   SESSION_STORAGE: new Shopify.Session.MemorySessionStorage(),
@@ -86,6 +89,114 @@ app.prepare().then(async () => {
     }
   );
 
+  router.get("/api/v1/reports", async (ctx) => {
+    try {
+      const reports = await Report.find({});
+      ctx.status = 200;
+      ctx.body = reports;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = error;
+    }
+  });
+  router.get("/api/v1/reports/:id", async (ctx) => {
+    try {
+      const report = await Report.findById(ctx.params.id);
+      ctx.status = 200;
+      ctx.body = report;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = error;
+    }
+  });
+  router.post("/api/v1/reports", async (ctx) => {
+    try {
+      const {
+        category,
+        links,
+        certificates,
+        imgUrl,
+        batchId,
+        cannabinoid,
+        cbdPercentage,
+        cdbMG_ML,
+      } = ctx.request.body;
+      const report = new Report({
+        category,
+        links,
+        certificates,
+        imgUrl,
+        batchId,
+        cannabinoid,
+        cbdPercentage,
+        cdbMG_ML,
+      });
+      await report.save();
+      ctx.status = 200;
+      ctx.body = report;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = error;
+    }
+  });
+  router.patch("/api/v1/reports/:id", async (ctx) => {
+    try {
+      const report = await Report.findById(ctx.params.id);
+      const {
+        category,
+        links,
+        certificates,
+        imgUrl,
+        batchId,
+        cannabinoid,
+        cbdPercentage,
+        cdbMG_ML,
+      } = ctx.request.body;
+      report.category = category;
+      report.links = links;
+      report.certificates = certificates;
+      report.imgUrl = imgUrl;
+      report.batchId = batchId;
+      report.cannabinoid = cannabinoid;
+      report.cbdPercentage = cbdPercentage;
+      report.cdbMG_ML = cdbMG_ML;
+      await report.save();
+      ctx.status = 200;
+      ctx.body = report;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = error;
+    }
+  });
+
+  //=======================================================//
+  //==================SCRIPT TAG ROUTES====================//
+
+  //===================CREATE SCRIPT TAGS=================//
+  //======================================================//
+
+  router.get("/installScriptTags", verifyRequest(), async (ctx, res) => {
+    const { shop, accessToken } = ctx.session;
+
+    const response = await scriptTag.createScriptTag(accessToken, shop);
+    //console.log(response);
+    ctx.body = response;
+    ctx.res.statusCode = 200;
+  });
+
+  //======================================================//
+  //          DELETE SCRIPT TAG ROUTER
+  //======================================================//
+
+  router.get("/uninstallScriptTag", verifyRequest(), async (ctx, res) => {
+    const { shop, accessToken } = ctx.session;
+    const scriptTagID = ctx.query.id;
+
+    await scriptTag.deleteScriptTag(accessToken, shop, scriptTagID);
+
+    ctx.res.statusCode = 200;
+  });
+
   router.get("(/_next/static/.*)", handleRequest); // Static content is clear
   router.get("/_next/webpack-hmr", handleRequest); // Webpack content is clear
   router.get("(.*)", async (ctx) => {
@@ -99,9 +210,11 @@ app.prepare().then(async () => {
     }
   });
 
+  server.use(bodyParser());
   server.use(router.allowedMethods());
   server.use(router.routes());
   server.listen(port, () => {
     console.log(`> Ready on http://localhost:${port}`);
+    connectDB;
   });
 });

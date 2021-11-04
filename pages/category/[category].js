@@ -3,25 +3,27 @@ import styles from "../../styles/Home.module.css";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import AddNew from "../../components/AddNew";
+import LoadingPage from "../../components/LoadingPage";
 
 const ShowAllByCat = () => {
   const router = useRouter();
   const { category } = router.query;
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [showAddNew, setShowAddNew] = useState(false);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    setLoading(true);
     const getAllreportbyCat = async () => {
-      const res = await fetch("http://localhost:5000/api/v1/reports");
+      const res = await fetch("/api/v1/reports");
       const data = await res.json();
-      const filteredData = data.reports.filter(
-        (item) => item.category === category
-      );
+      const filteredData = data.filter((item) => item.category === category);
       setData(filteredData);
     };
+
     getAllreportbyCat();
-  }, [category]);
+    setLoading(false);
+  }, [category, setData, setLoading, setShowAddNew]);
 
   const categories = data.map((report) => {
     return {
@@ -51,47 +53,53 @@ const ShowAllByCat = () => {
   };
 
   return (
-    <div className={styles.container}>
-      {!showAddNew ? (
-        <main className={styles.main}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-around",
-              width: "100%",
-            }}
-          >
-            <h1>{category}</h1>
+    <>
+      {loading && <LoadingPage />}
+      {!loading && (
+        <div className="container">
+          {!showAddNew ? (
+            <main className="main">
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-around",
+                  width: "100%",
+                }}
+              >
+                <h1>{category}</h1>
 
-            <button className={styles.btnAdd} onClick={handleAddNew}>
-              Add New
-            </button>
+                <button className="btnAdd" onClick={handleAddNew}>
+                  Add New
+                </button>
 
-            <Link href="/">
-              <button className={styles.btnEdit}>Back</button>
-            </Link>
-          </div>
-          <div className={styles.gridList}>
-            {data.map((item, index) => {
-              return (
-                <div className={styles.card} key={index}>
-                  <img src={item.imgUrl} alt={item.category} />
-                  <div className={styles.card_content}>
-                    <h3>{item.batchId}</h3>
-                    <p>{item.certificates}</p>
-                    <Link href={`/editReport/${item._id}`}>
-                      <button className={styles.btnEdit}>Edit</button>
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </main>
-      ) : (
-        <AddNew handleShow={handleAddNew} catData={categoryImgUrls} />
+                <Link href="/">
+                  <button className="btnEdit">Back</button>
+                </Link>
+              </div>
+              <div className="gridList">
+                {data.map((item, index) => {
+                  return (
+                    <div className={styles.card} key={index}>
+                      <img src={item.imgUrl} alt={item.category} />
+                      <div className="card_content">
+                        <h3>{item.batchId}</h3>
+                        <p>{item.certificates}</p>
+                        {item.cannabinoid ? <p>{item.cannabinoid}</p> : null}
+                        <Link href={`/editReport/${item._id}`}>
+                          <button className="btnEdit">Edit</button>
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </main>
+          ) : (
+            <AddNew handleShow={handleAddNew} catData={categoryImgUrls} />
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 };
 
