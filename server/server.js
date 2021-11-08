@@ -2,7 +2,7 @@ import "@babel/polyfill";
 import dotenv from "dotenv";
 import "isomorphic-fetch";
 import createShopifyAuth, { verifyRequest } from "@shopify/koa-shopify-auth";
-import Shopify, { ApiVersion } from "@shopify/shopify-api";
+import Shopify, { ApiVersion, DataType } from "@shopify/shopify-api";
 import Koa from "koa";
 import next from "next";
 import Router from "koa-router";
@@ -59,6 +59,22 @@ app.prepare().then(async () => {
             `Failed to register APP_UNINSTALLED webhook: ${response.result}`
           );
         }
+
+        // create a script tag on onload of the shopify app
+        const client = new Shopify.Clients.Rest(shop, accessToken);
+
+        const data = await client.post({
+          path: "script_tags",
+          data: {
+            script_tag: {
+              event: "onload",
+              src: `https://${host}/apps.js`,
+              id: "5d8f8f8f-b9b9-4b8b-b9b9-b9b9b9b9b9b9",
+            },
+          },
+          type: DataType.JSON,
+        });
+        console.log(data);
 
         // Redirect to app with shop parameter upon auth
         ctx.redirect(`/?shop=${shop}&host=${host}`);
@@ -119,7 +135,7 @@ app.prepare().then(async () => {
         batchId,
         cannabinoid,
         cbdPercentage,
-        cdbMG_ML,
+        cbdMG_ML,
       } = ctx.request.body;
       const report = new Report({
         category,
@@ -129,7 +145,7 @@ app.prepare().then(async () => {
         batchId,
         cannabinoid,
         cbdPercentage,
-        cdbMG_ML,
+        cbdMG_ML,
       });
       await report.save();
       ctx.status = 200;
@@ -150,7 +166,7 @@ app.prepare().then(async () => {
         batchId,
         cannabinoid,
         cbdPercentage,
-        cdbMG_ML,
+        cbdMG_ML,
       } = ctx.request.body;
       report.category = category;
       report.links = links;
@@ -159,7 +175,7 @@ app.prepare().then(async () => {
       report.batchId = batchId;
       report.cannabinoid = cannabinoid;
       report.cbdPercentage = cbdPercentage;
-      report.cdbMG_ML = cdbMG_ML;
+      report.cbdMG_ML = cbdMG_ML;
       await report.save();
       ctx.status = 200;
       ctx.body = report;
@@ -169,32 +185,25 @@ app.prepare().then(async () => {
     }
   });
 
-  //=======================================================//
-  //==================SCRIPT TAG ROUTES====================//
-
-  //===================CREATE SCRIPT TAGS=================//
-  //======================================================//
-
-  router.get("/installScriptTags", verifyRequest(), async (ctx, res) => {
-    const { shop, accessToken } = ctx.session;
-
-    const response = await scriptTag.createScriptTag(accessToken, shop);
-    //console.log(response);
-    ctx.body = response;
-    ctx.res.statusCode = 200;
-  });
-
-  //======================================================//
-  //          DELETE SCRIPT TAG ROUTER
-  //======================================================//
-
-  router.get("/uninstallScriptTag", verifyRequest(), async (ctx, res) => {
-    const { shop, accessToken } = ctx.session;
-    const scriptTagID = ctx.query.id;
-
-    await scriptTag.deleteScriptTag(accessToken, shop, scriptTagID);
-
-    ctx.res.statusCode = 200;
+  router.get(`/api/v1/reports/batchID/:bid`, async (ctx) => {
+    try {
+      const batchId = ctx.params.bid;
+      const reports = await Report.find({ batchId: batchId });
+      ctx.set("Access-Control-Allow-Origin", "*");
+      ctx.set(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+      );
+      ctx.set(
+        "Access-Control-Allow-Methods",
+        "POST, GET, PUT, DELETE, OPTIONS"
+      );
+      ctx.status = 200;
+      ctx.body = reports;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = error;
+    }
   });
 
   router.get("(/_next/static/.*)", handleRequest); // Static content is clear

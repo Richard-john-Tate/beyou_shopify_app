@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import styles from "../../styles/Home.module.css";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import AddNew from "../../components/AddNew";
 import LoadingPage from "../../components/LoadingPage";
+import {
+  ResourceList,
+  Card,
+  ResourceItem,
+  TextStyle,
+  Layout,
+  Page,
+} from "@shopify/polaris";
 
 const ShowAllByCat = () => {
   const router = useRouter();
@@ -53,53 +60,71 @@ const ShowAllByCat = () => {
   };
 
   return (
-    <>
+    <Layout sectioned>
       {loading && <LoadingPage />}
-      {!loading && (
-        <div className="container">
-          {!showAddNew ? (
-            <main className="main">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-around",
-                  width: "100%",
+      {!loading && !showAddNew ? (
+        <Page
+          breadcrumbs={[{ content: "Home", onAction: () => router.push("/") }]}
+          title={`${category}`}
+          primaryAction={{ content: "Add New", onAction: handleAddNew }}
+        >
+          <Layout.Section>
+            <Card>
+              <ResourceList
+                showHeader={true}
+                resourceName={{
+                  singular: `${category}`,
+                  plural: `${category}'s`,
                 }}
-              >
-                <h1>{category}</h1>
+                items={data}
+                renderItem={(report) => {
+                  const {
+                    batchId,
+                    category,
+                    imgUrl,
+                    certificates,
+                    _id,
+                  } = report;
+                  const shortcutActions = [
+                    {
+                      content: "Edit",
+                      onAction: () => router.push(`/editReport/${_id}`),
+                    },
+                  ];
 
-                <button className="btnAdd" onClick={handleAddNew}>
-                  Add New
-                </button>
-
-                <Link href="/">
-                  <button className="btnEdit">Back</button>
-                </Link>
-              </div>
-              <div className="gridList">
-                {data.map((item, index) => {
                   return (
-                    <div className={styles.card} key={index}>
-                      <img src={item.imgUrl} alt={item.category} />
-                      <div className="card_content">
-                        <h3>{item.batchId}</h3>
-                        <p>{item.certificates}</p>
-                        {item.cannabinoid ? <p>{item.cannabinoid}</p> : null}
-                        <Link href={`/editReport/${item._id}`}>
-                          <button className="btnEdit">Edit</button>
-                        </Link>
+                    <ResourceItem
+                      id={_id}
+                      accessibilityLabel={`View details for ${batchId}`}
+                      media={
+                        <img
+                          src={imgUrl}
+                          alt={category}
+                          style={{ width: "100px" }}
+                        />
+                      }
+                      shortcutActions={shortcutActions}
+                      accessibilityLabel={`View details for ${category}`}
+                    >
+                      <h3 style={{ marginTop: "1rem" }}>
+                        <TextStyle variation="strong">
+                          Batch No: {batchId}
+                        </TextStyle>
+                      </h3>
+                      <div style={{ marginTop: "1rem", padding: "1rem 0" }}>
+                        <p>{certificates}</p>
                       </div>
-                    </div>
+                    </ResourceItem>
                   );
-                })}
-              </div>
-            </main>
-          ) : (
-            <AddNew handleShow={handleAddNew} catData={categoryImgUrls} />
-          )}
-        </div>
+                }}
+              ></ResourceList>
+            </Card>
+          </Layout.Section>
+        </Page>
+      ) : (
+        <AddNew handleShow={handleAddNew} catData={categoryImgUrls} />
       )}
-    </>
+    </Layout>
   );
 };
 

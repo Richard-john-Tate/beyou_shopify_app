@@ -58,7 +58,7 @@ class MyApp extends App {
         <Provider
           config={{
             apiKey: API_KEY,
-            host: "bXktZ2F0c2J5LXRlc3Rpbmctc3RvcmUubXlzaG9waWZ5LmNvbS9hZG1pbg",
+            host: host,
             forceRedirect: true,
           }}
         >
